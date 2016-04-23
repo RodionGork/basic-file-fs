@@ -23,9 +23,8 @@ public class HeaderBlock extends Block {
     public String getName() {
         int size = getBuffer().get(NAME_LENGTH_OFFSET) & BYTE_MASK;
         byte[] bytes = new byte[size];
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = getBuffer().get(NAME_OFFSET + i);
-        }
+        getBuffer().position(NAME_OFFSET);
+        getBuffer().get(bytes);
         return new String(bytes);
     }
 
@@ -40,9 +39,8 @@ public class HeaderBlock extends Block {
     public void setName(String s) {
         byte[] bytes = s.getBytes();
         getBuffer().put(NAME_LENGTH_OFFSET, (byte) bytes.length);
-        for (int i = 0; i < bytes.length; i++) {
-            getBuffer().put(NAME_OFFSET + i, bytes[i]);
-        }
+        getBuffer().position(NAME_OFFSET);
+        getBuffer().put(bytes);
     }
 
     public Type getType() {

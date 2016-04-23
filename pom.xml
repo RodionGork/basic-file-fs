@@ -56,6 +56,7 @@
                     <includeResources>false</includeResources>
                     <includeTestResources>false</includeTestResources>
                     <configLocation>./checkstyle.xml</configLocation>
+                    <suppressionsLocation>./checkstyle-suppressions.xml</suppressionsLocation>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
                 <executions>

@@ -8,13 +8,26 @@ import java.io.ByteArrayInputStream;
  */
 public class MainTest {
 
+    BasicFs fs;
+
     public static void main(String... args) {
-        BasicFs fs = new BasicFs("sample.fs");
-        fs.createFile("/", "file1.txt", new ByteArrayInputStream("Hi, People!\nIt Works!\n".getBytes()));
+        new MainTest().run();
+    }
+
+    private void run() {
+        fs = new BasicFs("sample.fs");
+        fs.createFile("/", "executable.exe", new ByteArrayInputStream(new byte[] {(byte) 0xCD, 0x19}));
         fs.makeDirectory("/", "somedir");
-        fs.createFile("/somedir", "executable.exe", new ByteArrayInputStream(new byte[] {(byte) 0xCD, 0x19}));
+        fs.createFile("/somedir", "file1.txt", new ByteArrayInputStream("Hi, People!\nIt Works!\n".getBytes()));
         fs.createFile("/", "file22.bak", new ByteArrayInputStream(new byte[0]));
+        System.out.println(new String(readFile("/somedir/file1.txt")));
         fs.close();
+    }
+
+    private byte[] readFile(String path) {
+        byte[] buffer = new byte[fs.fileSize(path)];
+        fs.startReading(path).read(buffer);
+        return buffer;
     }
 
 }

@@ -1,6 +1,7 @@
 package none.rg.basicfs;
 
 import none.rg.basicfs.operations.Creation;
+import none.rg.basicfs.operations.Reading;
 import none.rg.basicfs.operations.Traversing;
 import none.rg.basicfs.operations.Writing;
 import none.rg.basicfs.storage.FileStorage;
@@ -15,6 +16,7 @@ public class BasicFs {
     private Traversing traversing;
     private Creation creation;
     private Writing writing;
+    private Reading reading;
 
     public BasicFs(String fileName) {
         FileStorage storage = new FileStorage();
@@ -31,6 +33,7 @@ public class BasicFs {
         traversing = new Traversing(blocks);
         creation = new Creation(blocks);
         writing = new Writing(blocks);
+        reading = new Reading(blocks);
         if (blocks.size() == 0) {
             creation.createRootDirectory();
         }
@@ -50,9 +53,45 @@ public class BasicFs {
     }
 
     private HeaderBlock createDirOrFile(String path, String name, HeaderBlock.Type type) {
-        HeaderBlock dir = traversing.findBlock(path);
+        HeaderBlock dir = findBlockOrError(path);
         HeaderBlock lastEntry = traversing.lastDirEntry(dir);
         return creation.createHeader(name, dir, lastEntry, type);
+    }
+
+    public int fileSize(String path) {
+        return findBlockOrError(path).getSize();
+    }
+
+    public ReadingHandle startReading(String path) {
+        HeaderBlock file = findBlockOrError(path);
+        return new ReadingHandle(file.getContentLink(), file.getSize());
+    }
+
+    private HeaderBlock findBlockOrError(String path) {
+        HeaderBlock block = traversing.findBlock(path);
+        if (block == null) {
+            throw new PathNotFoundException(path);
+        }
+        return block;
+    }
+
+    public class ReadingHandle {
+
+        private Reading.Cursor cursor;
+
+        public ReadingHandle(int address, int size) {
+            cursor = new Reading.Cursor(address, size);
+        }
+
+        public int read(byte[] buffer) {
+            return read(buffer, 0, buffer.length);
+        }
+
+        public int read(byte[] buffer, int start, int length) {
+            return reading.readMore(cursor, buffer, start, length);
+        }
+
+
     }
 
 }

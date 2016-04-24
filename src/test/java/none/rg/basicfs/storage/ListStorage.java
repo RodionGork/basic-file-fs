@@ -38,4 +38,11 @@ public class ListStorage implements PhysicalStorage {
     @Override
     public void close() {
     }
+
+    @Override
+    public void truncate(int size) {
+        while (list.size() > size) {
+            list.remove(list.size() - 1);
+        }
+    }
 }

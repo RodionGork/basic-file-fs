@@ -1,5 +1,7 @@
 package none.rg.basicfs;
 
+import none.rg.basicfs.exception.BasicFsException;
+import none.rg.basicfs.operations.Deleting;
 import none.rg.basicfs.operations.TreeOperations;
 import none.rg.basicfs.operations.Reading;
 import none.rg.basicfs.operations.Traversing;
@@ -17,6 +19,7 @@ public class BasicFs {
     private TreeOperations treeOperations;
     private Writing writing;
     private Reading reading;
+    private Deleting deleting;
 
     public BasicFs(String fileName) {
         FileStorage storage = new FileStorage();
@@ -34,6 +37,7 @@ public class BasicFs {
         treeOperations = new TreeOperations(blocks, traversing);
         writing = new Writing(blocks);
         reading = new Reading(blocks);
+        deleting = new Deleting(blocks, treeOperations);
         if (blocks.size() == 0) {
             treeOperations.createRootDirectory();
         }
@@ -80,6 +84,18 @@ public class BasicFs {
         HeaderBlock block = traversing.findBlockOrError(path);
         HeaderBlock dir = traversing.findBlockOrError(newPath);
         treeOperations.move(block, dir);
+    }
+
+    public void delete(String path) {
+        HeaderBlock block = traversing.findBlockOrError(path);
+        if (!block.isEmpty()) {
+            if (block.isDirectory()) {
+                throw new BasicFsException("Directory is not empty, delete is not allowed");
+            }
+            deleting.eraseFileContent(block);
+            block = traversing.findBlock(path);
+        }
+        deleting.eraseDirectoryEntry(block);
     }
 
     public class ReadingHandle {

@@ -2,13 +2,15 @@ package none.rg.basicfs.storage;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+
 import none.rg.basicfs.Block;
 
 public class FileStorage implements PhysicalStorage {
 
-    private static final int WRITE_CACHE_SIZE = 1024;
+    private static final int CACHE_SIZE = 1024;
     
     private RandomAccessFile file;
 
@@ -16,7 +18,7 @@ public class FileStorage implements PhysicalStorage {
 
     private int blockSize;
     
-    private Set<Integer> writePending = new HashSet<>();
+    private Map<Integer, byte[]> cache = new HashMap<>();
 
     public void init(String fileName, int blockSize) {
         try {
@@ -42,8 +44,8 @@ public class FileStorage implements PhysicalStorage {
         try {
             file.seek(Block.SIZE * (long) address);
             file.write(data);
-            writePending.add(address);
-            if (writePending.size() >= WRITE_CACHE_SIZE) {
+            cache.put(address, data);
+            if (cache.size() >= CACHE_SIZE) {
                 flush();
             }
             size = Integer.max(size, (int) (file.getFilePointer() / blockSize));
@@ -54,10 +56,11 @@ public class FileStorage implements PhysicalStorage {
 
     @Override
     public byte[] read(int address) {
+        byte[] fromCache = cache.get(address);
+        if (fromCache != null) {
+            return fromCache;
+        }
         try {
-            if (writePending.contains(address)) {
-                flush();
-            }
             file.seek(Block.SIZE * (long) address);
             byte[] block = new byte[blockSize];
             file.read(block);
@@ -72,9 +75,20 @@ public class FileStorage implements PhysicalStorage {
         return size;
     }
 
+    @Override
+    public void truncate(int size) {
+        this.size = size;
+        try {
+            file.setLength(Block.SIZE * (long) size);
+            flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void flush() throws IOException {
         file.getFD().sync();
-        writePending.clear();
+        cache.clear();
     }
 
 }

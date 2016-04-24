@@ -10,4 +10,5 @@ public interface PhysicalStorage {
 
     void close();
 
+    void truncate(int size);
 }

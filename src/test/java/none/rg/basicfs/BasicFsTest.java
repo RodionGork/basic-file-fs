@@ -45,6 +45,12 @@ public class BasicFsTest {
         Assert.assertEquals(TEST_FILE_SIZE, bytesRead);
         double readSpeed = TEST_FILE_SIZE / MEGABYTE / (time / 1000.0);
         System.out.printf("Read speed: %.1f Mb/sec%n", readSpeed);
+        time = System.currentTimeMillis() - time;
+        fs.delete("/test.bin");
+        time = System.currentTimeMillis() - time;
+        double deleteSpeed = TEST_FILE_SIZE / MEGABYTE / (time / 1000.0);
+        Assert.assertEquals(256, new File(TEMP_FILE_NAME).length());
+        System.out.printf("Delete speed: %.1f Mb/sec%n", deleteSpeed);
     }
 
     private int performReading() {

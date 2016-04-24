@@ -76,7 +76,7 @@ public class TreeOperations {
         blocks.write(block);
     }
 
-    private void detachDirectoryEntry(HeaderBlock block) {
+    public void detachDirectoryEntry(HeaderBlock block) {
         int prev = block.getBackLink();
         HeaderBlock prevBlock = blocks.readHeader(prev);
         int next = block.getNextLink();

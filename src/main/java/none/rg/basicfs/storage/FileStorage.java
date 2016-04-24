@@ -1,21 +1,26 @@
 package none.rg.basicfs.storage;
 
-import none.rg.basicfs.Block;
-
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.HashSet;
+import java.util.Set;
+import none.rg.basicfs.Block;
 
 public class FileStorage implements PhysicalStorage {
 
+    private static final int WRITE_CACHE_SIZE = 1024;
+    
     private RandomAccessFile file;
 
     private int size;
 
     private int blockSize;
+    
+    private Set<Integer> writePending = new HashSet<>();
 
     public void init(String fileName, int blockSize) {
         try {
-            file = new RandomAccessFile(fileName, "rws");
+            file = new RandomAccessFile(fileName, "rw");
             size = (int) (file.length() / blockSize);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -37,6 +42,10 @@ public class FileStorage implements PhysicalStorage {
         try {
             file.seek(Block.SIZE * (long) address);
             file.write(data);
+            writePending.add(address);
+            if (writePending.size() >= WRITE_CACHE_SIZE) {
+                flush();
+            }
             size = Integer.max(size, (int) (file.getFilePointer() / blockSize));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -46,6 +55,9 @@ public class FileStorage implements PhysicalStorage {
     @Override
     public byte[] read(int address) {
         try {
+            if (writePending.contains(address)) {
+                flush();
+            }
             file.seek(Block.SIZE * (long) address);
             byte[] block = new byte[blockSize];
             file.read(block);
@@ -58,6 +70,11 @@ public class FileStorage implements PhysicalStorage {
     @Override
     public int size() {
         return size;
+    }
+
+    private void flush() throws IOException {
+        file.getFD().sync();
+        writePending.clear();
     }
 
 }

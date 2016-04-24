@@ -1,7 +1,10 @@
 package none.rg.basicfs.operations;
 
+import none.rg.basicfs.Block;
 import none.rg.basicfs.BlockStorage;
 import none.rg.basicfs.HeaderBlock;
+import none.rg.basicfs.exception.EntryExistsException;
+import none.rg.basicfs.exception.PathNotFoundException;
 
 public class Traversing {
 
@@ -37,6 +40,33 @@ public class Traversing {
             cur = findBlock(cur, name);
         }
         return cur;
+    }
+
+    public HeaderBlock findBlockOrError(String path) {
+        HeaderBlock block = findBlock(path);
+        if (block == null) {
+            throw new PathNotFoundException(path);
+        }
+        return block;
+    }
+
+    public HeaderBlock lastDirEntry(HeaderBlock dir, String name) {
+        int currentAddress = dir.getContentLink();
+        if (currentAddress == Block.ILLEGAL) {
+            return null;
+        }
+        HeaderBlock entry;
+        while (true) {
+            entry = blocks.readHeader(currentAddress);
+            if (entry.getName().equals(name)) {
+                throw new EntryExistsException(name);
+            }
+            int next = entry.getNextLink();
+            if (next < 0) {
+                return entry;
+            }
+            currentAddress = next;
+        }
     }
 
 }

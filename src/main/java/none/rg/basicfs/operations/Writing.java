@@ -1,11 +1,11 @@
 package none.rg.basicfs.operations;
 
+import java.io.InputStream;
 import none.rg.basicfs.Block;
 import none.rg.basicfs.BlockStorage;
 import none.rg.basicfs.ContentBlock;
 import none.rg.basicfs.HeaderBlock;
-
-import java.io.InputStream;
+import none.rg.basicfs.exception.WrongEntryTypeException;
 
 public class Writing {
 
@@ -16,6 +16,7 @@ public class Writing {
     }
 
     public void appendFile(HeaderBlock header, InputStream inputStream) {
+        WrongEntryTypeException.check(header, HeaderBlock.Type.FILE);
         CountingInput input = new CountingInput(inputStream);
         ContentBlock lastBlock = lastContentBlock(header);
         amendExistingTail(input, header, lastBlock);

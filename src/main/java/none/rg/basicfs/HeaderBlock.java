@@ -50,5 +50,13 @@ public class HeaderBlock extends Block {
     public boolean isEmpty() {
         return getContentLink() == Block.ILLEGAL;
     }
+    
+    public boolean isDirectory() {
+        return getType() == Type.DIRECTORY;
+    }
+    
+    public boolean isRoot() {
+        return getBackLink() == Block.ILLEGAL;
+    }
 
 }

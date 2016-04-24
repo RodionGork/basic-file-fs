@@ -23,9 +23,12 @@ public class MainTest {
         fs = new BasicFs(f.getName());
         fs.createFile("/", "executable.exe", new ByteArrayInputStream(new byte[] {(byte) 0xCD, 0x19}));
         fs.makeDirectory("/", "somedir");
-        fs.createFile("/somedir", "file1.txt", new ByteArrayInputStream("Hi, People!\nIt Works!\n".getBytes()));
-        fs.createFile("/", "file22.bak", new ByteArrayInputStream(new byte[0]));
-        System.out.println(new String(readFile("/somedir/file1.txt")));
+        fs.createFile("/", "file1.txt", new ByteArrayInputStream("Hi, People!\nIt Works!\n".getBytes()));
+        fs.createFile("/somedir", "file22.bak", new ByteArrayInputStream(new byte[0]));
+        fs.move("/file1.txt", "/somedir");
+        fs.move("/somedir/file22.bak", "/");
+        fs.rename("/somedir/file1.txt", "text-file.txt");
+        System.out.println(new String(readFile("/somedir/text-file.txt")));
         fs.close();
     }
 

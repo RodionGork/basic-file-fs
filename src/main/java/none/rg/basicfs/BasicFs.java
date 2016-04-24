@@ -1,7 +1,6 @@
 package none.rg.basicfs;
 
-import none.rg.basicfs.exception.PathNotFoundException;
-import none.rg.basicfs.operations.Creation;
+import none.rg.basicfs.operations.TreeOperations;
 import none.rg.basicfs.operations.Reading;
 import none.rg.basicfs.operations.Traversing;
 import none.rg.basicfs.operations.Writing;
@@ -15,7 +14,7 @@ public class BasicFs {
     private BlockStorage blocks;
 
     private Traversing traversing;
-    private Creation creation;
+    private TreeOperations treeOperations;
     private Writing writing;
     private Reading reading;
 
@@ -32,11 +31,11 @@ public class BasicFs {
     private void init(PhysicalStorage storage) {
         blocks = new BlockStorage(storage);
         traversing = new Traversing(blocks);
-        creation = new Creation(blocks);
+        treeOperations = new TreeOperations(blocks, traversing);
         writing = new Writing(blocks);
         reading = new Reading(blocks);
         if (blocks.size() == 0) {
-            creation.createRootDirectory();
+            treeOperations.createRootDirectory();
         }
     }
 
@@ -53,26 +52,34 @@ public class BasicFs {
         writing.appendFile(fileHead, input);
     }
 
+    public void appendFile(String path, InputStream input) {
+        HeaderBlock fileHead = traversing.findBlockOrError(path);
+        writing.appendFile(fileHead, input);
+    }
+
     private HeaderBlock createDirOrFile(String path, String name, HeaderBlock.Type type) {
-        HeaderBlock dir = findBlockOrError(path);
-        return creation.createDirectoryEntry(dir, name, type);
+        HeaderBlock dir = traversing.findBlockOrError(path);
+        return treeOperations.createDirectoryEntry(dir, name, type);
     }
 
     public int fileSize(String path) {
-        return findBlockOrError(path).getSize();
+        return traversing.findBlockOrError(path).getSize();
     }
 
     public ReadingHandle startReading(String path) {
-        HeaderBlock file = findBlockOrError(path);
+        HeaderBlock file = traversing.findBlockOrError(path);
         return new ReadingHandle(file.getContentLink(), file.getSize());
     }
-
-    private HeaderBlock findBlockOrError(String path) {
-        HeaderBlock block = traversing.findBlock(path);
-        if (block == null) {
-            throw new PathNotFoundException(path);
-        }
-        return block;
+    
+    public void rename(String path, String name) {
+        HeaderBlock block = traversing.findBlockOrError(path);
+        treeOperations.rename(block, name);
+    }
+    
+    public void move(String path, String newPath) {
+        HeaderBlock block = traversing.findBlockOrError(path);
+        HeaderBlock dir = traversing.findBlockOrError(newPath);
+        treeOperations.move(block, dir);
     }
 
     public class ReadingHandle {

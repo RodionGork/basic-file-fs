@@ -3,6 +3,7 @@ package none.rg.basicfs.operations;
 import none.rg.basicfs.Block;
 import none.rg.basicfs.BlockStorage;
 import none.rg.basicfs.HeaderBlock;
+import none.rg.basicfs.exception.EntryExistsException;
 
 public class Creation {
 
@@ -45,6 +46,30 @@ public class Creation {
         block.setAddress(address);
         blocks.write(block);
         return block;
+    }
+
+    public HeaderBlock createDirectoryEntry(HeaderBlock dir, String name, HeaderBlock.Type type) {
+        HeaderBlock lastEntry = lastDirEntry(dir, name);
+        return createHeader(name, dir, lastEntry, type);
+    }
+    
+    public HeaderBlock lastDirEntry(HeaderBlock dir, String name) {
+        int currentAddress = dir.getContentLink();
+        if (currentAddress == Block.ILLEGAL) {
+            return null;
+        }
+        HeaderBlock entry;
+        while (true) {
+            entry = blocks.readHeader(currentAddress);
+            if (entry.getName().equals(name)) {
+                throw new EntryExistsException(name);
+            }
+            int next = entry.getNextLink();
+            if (next < 0) {
+                return entry;
+            }
+            currentAddress = next;
+        }
     }
 
 }

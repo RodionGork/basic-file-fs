@@ -1,6 +1,5 @@
 package none.rg.basicfs.operations;
 
-import none.rg.basicfs.Block;
 import none.rg.basicfs.BlockStorage;
 import none.rg.basicfs.HeaderBlock;
 
@@ -38,22 +37,6 @@ public class Traversing {
             cur = findBlock(cur, name);
         }
         return cur;
-    }
-
-    public HeaderBlock lastDirEntry(HeaderBlock dir) {
-        int currentAddress = dir.getContentLink();
-        if (currentAddress == Block.ILLEGAL) {
-            return null;
-        }
-        HeaderBlock entry;
-        while (true) {
-            entry = blocks.readHeader(currentAddress);
-            int next = entry.getNextLink();
-            if (next < 0) {
-                return entry;
-            }
-            currentAddress = next;
-        }
     }
 
 }

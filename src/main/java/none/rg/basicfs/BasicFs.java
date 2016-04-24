@@ -1,5 +1,6 @@
 package none.rg.basicfs;
 
+import none.rg.basicfs.exception.PathNotFoundException;
 import none.rg.basicfs.operations.Creation;
 import none.rg.basicfs.operations.Reading;
 import none.rg.basicfs.operations.Traversing;
@@ -54,8 +55,7 @@ public class BasicFs {
 
     private HeaderBlock createDirOrFile(String path, String name, HeaderBlock.Type type) {
         HeaderBlock dir = findBlockOrError(path);
-        HeaderBlock lastEntry = traversing.lastDirEntry(dir);
-        return creation.createHeader(name, dir, lastEntry, type);
+        return creation.createDirectoryEntry(dir, name, type);
     }
 
     public int fileSize(String path) {

@@ -1,6 +1,7 @@
 package none.rg.basicfs;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 
 /**
  * For now it is going to be used for manual-testing purposes
@@ -15,7 +16,11 @@ public class MainTest {
     }
 
     private void run() {
-        fs = new BasicFs("sample.fs");
+        File f = new File("sample.fs");
+        if (f.exists()) {
+            f.delete();
+        }
+        fs = new BasicFs(f.getName());
         fs.createFile("/", "executable.exe", new ByteArrayInputStream(new byte[] {(byte) 0xCD, 0x19}));
         fs.makeDirectory("/", "somedir");
         fs.createFile("/somedir", "file1.txt", new ByteArrayInputStream("Hi, People!\nIt Works!\n".getBytes()));

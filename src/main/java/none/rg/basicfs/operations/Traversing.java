@@ -40,6 +40,7 @@ public class Traversing {
         return cur;
     }
 
+    // TODO: why is it not in Creation?
     public HeaderBlock lastDirEntry(HeaderBlock dir) {
         int currentAddress = dir.getContentLink();
         if (currentAddress == Block.ILLEGAL) {

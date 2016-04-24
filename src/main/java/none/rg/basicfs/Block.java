@@ -53,4 +53,18 @@ public class Block {
         buffer.putInt(NEXT_LINK_OFFSET, v);
     }
 
+    public HeaderBlock asHeaderBlock() {
+        return asSpecificBlock(new HeaderBlock());
+    }
+
+    public ContentBlock asContentBlock() {
+        return asSpecificBlock(new ContentBlock());
+    }
+
+    private <T extends Block> T asSpecificBlock(T block) {
+        block.getBuffer().put(buffer.array());
+        block.setAddress(address);
+        return block;
+    }
+
 }

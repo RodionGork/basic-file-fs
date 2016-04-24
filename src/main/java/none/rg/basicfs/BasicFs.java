@@ -6,6 +6,8 @@ import none.rg.basicfs.operations.Writing;
 import none.rg.basicfs.storage.FileStorage;
 import none.rg.basicfs.storage.PhysicalStorage;
 
+import java.io.InputStream;
+
 public class BasicFs {
 
     private BlockStorage blocks;
@@ -42,14 +44,15 @@ public class BasicFs {
         createDirOrFile(path, name, HeaderBlock.Type.DIRECTORY);
     }
 
-    public void createFile(String path, String name) {
-        createDirOrFile(path, name, HeaderBlock.Type.FILE);
+    public void createFile(String path, String name, InputStream input) {
+        HeaderBlock fileHead = createDirOrFile(path, name, HeaderBlock.Type.FILE);
+        writing.appendFile(fileHead, input);
     }
 
-    private void createDirOrFile(String path, String name, HeaderBlock.Type type) {
+    private HeaderBlock createDirOrFile(String path, String name, HeaderBlock.Type type) {
         HeaderBlock dir = traversing.findBlock(path);
         HeaderBlock lastEntry = traversing.lastDirEntry(dir);
-        creation.createHeader(name, dir, lastEntry, type);
+        return creation.createHeader(name, dir, lastEntry, type);
     }
 
 }

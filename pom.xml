@@ -35,7 +35,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>none.rg.basicfs.MainTest</mainClass>
+                            <mainClass>none.rg.basicfs.CommandLineInterface</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

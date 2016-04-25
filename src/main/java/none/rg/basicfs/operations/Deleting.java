@@ -17,14 +17,19 @@ public class Deleting {
     }
 
     public void eraseFileContent(HeaderBlock block) {
+        int headerBlockAddress = block.getAddress();
         int currentAddress = block.getContentLink();
         int lastBlockAddress = blocks.size();
         while (currentAddress != Block.ILLEGAL) {
             int next = blocks.readContent(currentAddress).getNextLink();
             lastBlockAddress -= 1;
             moveBlock(lastBlockAddress, currentAddress);
+            if (headerBlockAddress == lastBlockAddress) {
+                headerBlockAddress = currentAddress;
+            }
             currentAddress = next;
         }
+        block = blocks.readHeader(headerBlockAddress);
         block.setContentLink(Block.ILLEGAL);
         block.setSize(0);
         blocks.write(block);

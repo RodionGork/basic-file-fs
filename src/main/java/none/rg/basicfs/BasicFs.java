@@ -10,6 +10,7 @@ import none.rg.basicfs.storage.FileStorage;
 import none.rg.basicfs.storage.PhysicalStorage;
 
 import java.io.InputStream;
+import java.util.List;
 
 public class BasicFs {
 
@@ -20,6 +21,7 @@ public class BasicFs {
     private Writing writing;
     private Reading reading;
     private Deleting deleting;
+    private FsUtils utils;
 
     public BasicFs(String fileName) {
         FileStorage storage = new FileStorage();
@@ -38,6 +40,7 @@ public class BasicFs {
         writing = new Writing(blocks);
         reading = new Reading(blocks);
         deleting = new Deleting(blocks, treeOperations);
+        utils = new FsUtils(this, traversing);
         if (blocks.size() == 0) {
             treeOperations.createRootDirectory();
         }
@@ -70,6 +73,11 @@ public class BasicFs {
         return traversing.findBlockOrError(path).getSize();
     }
 
+    public HeaderBlock.Type fileType(String path) {
+        HeaderBlock block = traversing.findBlock(path);
+        return block == null ? null : block.getType();
+    }
+
     public ReadingHandle startReading(String path) {
         HeaderBlock file = traversing.findBlockOrError(path);
         return new ReadingHandle(file.getContentLink(), file.getSize());
@@ -96,6 +104,15 @@ public class BasicFs {
             block = traversing.findBlock(path);
         }
         deleting.eraseDirectoryEntry(block);
+    }
+
+    public List<String> list(String path) {
+        HeaderBlock block = traversing.findBlockOrError(path);
+        return traversing.createList(block);
+    }
+
+    public FsUtils getUtils() {
+        return utils;
     }
 
     public class ReadingHandle {

@@ -6,6 +6,10 @@ import none.rg.basicfs.HeaderBlock;
 import none.rg.basicfs.exception.EntryExistsException;
 import none.rg.basicfs.exception.PathNotFoundException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Traversing {
 
     private BlockStorage blocks;
@@ -69,4 +73,21 @@ public class Traversing {
         }
     }
 
+    public List<String> createList(HeaderBlock block) {
+        if (!block.isDirectory()) {
+            return Arrays.asList(block.getName());
+        }
+        List<String> result = new ArrayList<>();
+        int next = block.getContentLink();
+        while (next != Block.ILLEGAL) {
+            HeaderBlock entry = blocks.readHeader(next);
+            String name = entry.getName();
+            if (entry.isDirectory()) {
+                name += "/";
+            }
+            result.add(name);
+            next = entry.getNextLink();
+        }
+        return result;
+    }
 }

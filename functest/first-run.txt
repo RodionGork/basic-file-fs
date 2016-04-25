@@ -1,0 +1,12 @@
+put ../src
+mkdir src2
+cd src2
+put ../src
+cd ..
+mkdir src3
+cd src3
+put ../src
+cd ..
+deltree src
+deltree src3
+exit

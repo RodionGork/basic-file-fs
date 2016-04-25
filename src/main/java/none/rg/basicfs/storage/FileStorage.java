@@ -2,6 +2,7 @@ package none.rg.basicfs.storage;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class FileStorage implements PhysicalStorage {
         try {
             file.seek(Block.SIZE * (long) address);
             file.write(data);
-            cache.put(address, data);
+            cache.put(address, Arrays.copyOf(data, Block.SIZE));
             if (cache.size() >= CACHE_SIZE) {
                 flush();
             }
@@ -57,7 +58,7 @@ public class FileStorage implements PhysicalStorage {
     public byte[] read(int address) {
         byte[] fromCache = cache.get(address);
         if (fromCache != null) {
-            return fromCache;
+            return Arrays.copyOf(fromCache, Block.SIZE);
         }
         try {
             file.seek(Block.SIZE * (long) address);

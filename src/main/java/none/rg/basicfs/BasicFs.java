@@ -99,14 +99,41 @@ public class BasicFs {
 
     public void delete(String path) {
         HeaderBlock block = traversing.findBlockOrError(path);
+        Deleting.DeletionCounters counters = new Deleting.DeletionCounters(blocks.size());
         if (!block.isEmpty()) {
             if (block.isDirectory()) {
                 throw new BasicFsException("Directory is not empty, delete is not allowed");
             }
-            deleting.eraseFileContent(block);
+            deleting.eraseFileContent(block, counters);
             block = traversing.findBlock(path);
         }
-        deleting.eraseDirectoryEntry(block);
+        deleting.eraseDirectoryEntry(block, counters, true);
+    }
+
+    public int deleteTree(String path) {
+        HeaderBlock block = traversing.findBlockOrError(path);
+        if (block.isRoot()) {
+            throw new BasicFsException("Root entry could not be deleted");
+        }
+        Deleting.DeletionCounters counters = new Deleting.DeletionCounters(blocks.size());
+        deleteTree(path, counters, true);
+        return counters.getEntries();
+    }
+
+    private void deleteTree(String path, Deleting.DeletionCounters counters, boolean truncate) {
+        HeaderBlock block = traversing.findBlock(path);
+        if (block == null) {
+            System.out.println("NULL for " + path);
+        }
+        if (block.isDirectory()) {
+            for (String child : list(path)) {
+                deleteTree(path + "/" + child, counters, false);
+            }
+        } else {
+            deleting.eraseFileContent(block, counters);
+        }
+        block = traversing.findBlock(path);
+        deleting.eraseDirectoryEntry(block, counters, truncate);
     }
 
     public List<String> list(String path) {

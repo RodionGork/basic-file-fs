@@ -16,26 +16,23 @@ public class Deleting {
         this.treeOperations = treeOperations;
     }
 
-    public void eraseFileContent(HeaderBlock block) {
+    public void eraseFileContent(HeaderBlock block, DeletionCounters counters) {
         int headerBlockAddress = block.getAddress();
         int currentAddress = block.getContentLink();
-        int lastBlockAddress = blocks.size();
-        while (currentAddress != Block.ILLEGAL) {
-            int next = blocks.readContent(currentAddress).getNextLink();
-            lastBlockAddress -= 1;
-            moveBlock(lastBlockAddress, currentAddress);
-            if (headerBlockAddress == lastBlockAddress) {
-                headerBlockAddress = currentAddress;
-            }
-            if (next != lastBlockAddress) {
-                currentAddress = next;
-            }
-        }
-        block = blocks.readHeader(headerBlockAddress);
         block.setContentLink(Block.ILLEGAL);
         block.setSize(0);
         blocks.write(block);
-        blocks.truncate(lastBlockAddress);
+        while (currentAddress != Block.ILLEGAL) {
+            int next = blocks.readContent(currentAddress).getNextLink();
+            counters.size -= 1;
+            moveBlock(counters.size, currentAddress);
+            if (headerBlockAddress == counters.size) {
+                headerBlockAddress = currentAddress;
+            }
+            if (next != counters.size) {
+                currentAddress = next;
+            }
+        }
     }
 
     private void moveBlock(int from, int to) {
@@ -87,14 +84,32 @@ public class Deleting {
         blocks.write(block);
     }
 
-    public void eraseDirectoryEntry(HeaderBlock block) {
+    public void eraseDirectoryEntry(HeaderBlock block, DeletionCounters counters, boolean truncate) {
         if (block.isRoot()) {
             throw new BasicFsException("Root directory could not be deleted");
         }
         treeOperations.detachDirectoryEntry(block);
-        int lastBlockAddress = blocks.size() - 1;
-        moveBlock(lastBlockAddress, block.getAddress());
-        blocks.truncate(lastBlockAddress);
+        counters.size -= 1;
+        moveBlock(counters.size, block.getAddress());
+        counters.entries += 1;
+        if (truncate) {
+            blocks.truncate(counters.size);
+        }
+    }
+
+    public static class DeletionCounters {
+
+        private int size;
+        private int entries;
+
+        public DeletionCounters(int size) {
+            this.size = size;
+            this.entries = 0;
+        }
+
+        public int getEntries() {
+            return entries;
+        }
     }
 
 }

@@ -64,7 +64,7 @@ public class CommandLineInterface {
         }
         if (command.equals("deltree")) {
             if (line.size() > 1) {
-                int total = fs.getUtils().deleteTree(currentPath + "/" + line.get(1));
+                int total = fs.deleteTree(currentPath + "/" + line.get(1));
                 System.out.println("Total entities deleted: " + total);
             }
         }

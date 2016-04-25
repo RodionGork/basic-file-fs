@@ -80,18 +80,4 @@ public class FsUtils {
         }
     }
 
-    public int deleteTree(String path) {
-        HeaderBlock block = traversing.findBlock(path);
-        if (block == null || block.isRoot()) {
-            return 0;
-        }
-        int sum = 1;
-        if (block.isDirectory()) {
-            for (String child : fs.list(path)) {
-                sum += deleteTree(path + "/" + child);
-            }
-        }
-        fs.delete(path);
-        return sum;
-    }
 }

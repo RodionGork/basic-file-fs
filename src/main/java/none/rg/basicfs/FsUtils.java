@@ -1,5 +1,6 @@
 package none.rg.basicfs;
 
+import none.rg.basicfs.blocks.HeaderBlock;
 import none.rg.basicfs.operations.Traversing;
 
 import java.io.File;

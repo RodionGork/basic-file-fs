@@ -1,4 +1,4 @@
-package none.rg.basicfs;
+package none.rg.basicfs.blocks;
 
 import java.nio.ByteBuffer;
 

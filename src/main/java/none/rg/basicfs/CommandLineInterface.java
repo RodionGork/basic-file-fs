@@ -1,5 +1,7 @@
 package none.rg.basicfs;
 
+import none.rg.basicfs.blocks.HeaderBlock;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;

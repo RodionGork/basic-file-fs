@@ -5,7 +5,7 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Map;
 
-import none.rg.basicfs.Block;
+import none.rg.basicfs.blocks.Block;
 
 public class FileStorage implements PhysicalStorage {
 

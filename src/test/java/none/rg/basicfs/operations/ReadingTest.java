@@ -1,7 +1,7 @@
 package none.rg.basicfs.operations;
 
-import none.rg.basicfs.Block;
-import none.rg.basicfs.ContentBlock;
+import none.rg.basicfs.blocks.Block;
+import none.rg.basicfs.blocks.ContentBlock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

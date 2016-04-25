@@ -1,7 +1,7 @@
 package none.rg.basicfs.storage;
 
-import none.rg.basicfs.Block;
-import none.rg.basicfs.ContentBlock;
+import none.rg.basicfs.blocks.Block;
+import none.rg.basicfs.blocks.ContentBlock;
 
 import java.util.ArrayList;
 import java.util.List;

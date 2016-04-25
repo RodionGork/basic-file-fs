@@ -1,6 +1,6 @@
 package none.rg.basicfs.exception;
 
-import none.rg.basicfs.HeaderBlock;
+import none.rg.basicfs.blocks.HeaderBlock;
 
 public class WrongEntryTypeException extends BasicFsException {
     

@@ -1,8 +1,8 @@
 package none.rg.basicfs.operations;
 
-import none.rg.basicfs.Block;
-import none.rg.basicfs.BlockStorage;
-import none.rg.basicfs.HeaderBlock;
+import none.rg.basicfs.blocks.Block;
+import none.rg.basicfs.blocks.BlockStorage;
+import none.rg.basicfs.blocks.HeaderBlock;
 import none.rg.basicfs.exception.EntryExistsException;
 import none.rg.basicfs.exception.PathNotFoundException;
 

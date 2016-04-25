@@ -1,4 +1,4 @@
-package none.rg.basicfs;
+package none.rg.basicfs.blocks;
 
 public class HeaderBlock extends Block {
 

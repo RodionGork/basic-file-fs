@@ -27,7 +27,9 @@ public class Deleting {
             if (headerBlockAddress == lastBlockAddress) {
                 headerBlockAddress = currentAddress;
             }
-            currentAddress = next;
+            if (next != lastBlockAddress) {
+                currentAddress = next;
+            }
         }
         block = blocks.readHeader(headerBlockAddress);
         block.setContentLink(Block.ILLEGAL);
